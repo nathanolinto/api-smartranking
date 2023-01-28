@@ -1,6 +1,6 @@
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { PlayerModule } from './player/player.module';
+import { PlayersModule } from './players/players.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -16,7 +16,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    PlayerModule,
+    PlayersModule,
   ],
   controllers: [],
   providers: [],

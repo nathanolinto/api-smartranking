@@ -4,7 +4,7 @@ import { IPlayer } from './interfaces/player.interface';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
-export class PlayerService {
+export class PlayersService {
   private players: IPlayer[] = [];
 
   async createPlayer(createPlayerDto: CreatePlayerDto): Promise<IPlayer> {
