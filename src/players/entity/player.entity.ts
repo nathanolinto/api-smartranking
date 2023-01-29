@@ -4,18 +4,19 @@ import {
   ObjectIdColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ObjectID,
 } from 'typeorm';
 import { IPlayer } from '../interfaces/player.interface';
 
 @Entity()
 export class Player implements IPlayer {
   @ObjectIdColumn()
-  _id: string;
+  _id: ObjectID;
 
   @Column()
   name: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()

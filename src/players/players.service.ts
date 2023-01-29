@@ -1,16 +1,15 @@
 import {
-  ConflictException,
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePlayerDto } from './dto/create-player.dto';
-import { IPlayer } from './interfaces/player.interface';
-import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Player } from './entity/player.entity';
 import { MongoRepository } from 'typeorm';
 import { IDelete } from './interfaces/delete.interface';
 import { UpdatePlayerDto } from './dto/update-player.dto';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class PlayersService {
@@ -19,55 +18,38 @@ export class PlayersService {
     private readonly playerRepository: MongoRepository<Player>,
   ) {}
 
-  async createPlayer(createPlayerDto: CreatePlayerDto): Promise<IPlayer> {
+  async createPlayer(createPlayerDto: CreatePlayerDto): Promise<Player> {
     const { email } = createPlayerDto;
-    const foundPlayer = await this.playerRepository.findOne({
-      where: { email },
-    });
+    const foundPlayer = await this.playerRepository.findOneBy({ email });
     if (foundPlayer) {
-      throw new ConflictException('Player with e-mail already exists');
+      throw new BadRequestException('Player with e-mail already exists');
     }
-    const player: IPlayer = {
-      _id: uuidv4(),
-      name: createPlayerDto.name,
-      email,
-      phone: createPlayerDto.phone,
-      ranking: 'A',
-      positionRanking: 1,
-      urlPhoto: 'any_url',
-    };
-    return await this.playerRepository.save(player);
+    return await this.playerRepository.save(createPlayerDto);
   }
 
   async updatePlayer(
     id: string,
     updatePlayerDto: UpdatePlayerDto,
-  ): Promise<IPlayer> {
-    console.log(updatePlayerDto);
-    const foundPlayer = await this.playerRepository.findOne({
-      where: { _id: id },
+  ): Promise<Player> {
+    const idObjectId = new ObjectId(id);
+    const foundPlayer = await this.playerRepository.findOneBy({
+      _id: idObjectId,
     });
-
     if (!foundPlayer) {
       throw new NotFoundException('Player not found');
     }
-
-    const { value: updatedPlayer } =
-      await this.playerRepository.findOneAndUpdate(
-        { _id: id },
-        { $set: updatePlayerDto },
-      );
-
+    const updatedPlayer = Object.assign(foundPlayer, updatePlayerDto);
+    await this.playerRepository.save(updatedPlayer);
     return updatedPlayer;
   }
 
-  async getAllPlayers(): Promise<IPlayer[]> {
+  async getAllPlayers(): Promise<Player[]> {
     return await this.playerRepository.find();
   }
 
-  async getPlayerById(id: string): Promise<IPlayer> {
-    const player = await this.playerRepository.findOne({
-      where: { _id: id },
+  async getPlayerById(id: string) {
+    const player = await this.playerRepository.findOneBy({
+      _id: new ObjectId(id),
     });
     if (!player) {
       throw new NotFoundException('Player not found');
@@ -77,7 +59,7 @@ export class PlayersService {
 
   async deletePlayerById(id: string): Promise<IDelete> {
     const { deletedCount: count } = await this.playerRepository.deleteOne({
-      _id: id,
+      _id: new ObjectId(id),
     });
     return { count };
   }

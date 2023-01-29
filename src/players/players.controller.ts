@@ -10,7 +10,7 @@ import {
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { IDelete } from './interfaces/delete.interface';
-import { IPlayer } from './interfaces/player.interface';
+import { Player } from './entity/player.entity';
 import { PlayersService } from './players.service';
 
 @Controller('players')
@@ -18,19 +18,19 @@ export class PlayerController {
   constructor(private readonly playersService: PlayersService) {}
 
   @Get()
-  async getAllPlayers(): Promise<IPlayer[]> {
+  async getAllPlayers(): Promise<Player[]> {
     return await this.playersService.getAllPlayers();
   }
 
   @Get(':id')
-  async getPlayerById(@Param('id') id: string): Promise<IPlayer> {
+  async getPlayerById(@Param('id') id: string) {
     return await this.playersService.getPlayerById(id);
   }
 
   @Post()
   async createPlayer(
     @Body() createPlayerDto: CreatePlayerDto,
-  ): Promise<IPlayer> {
+  ): Promise<Player> {
     return await this.playersService.createPlayer(createPlayerDto);
   }
 
@@ -38,7 +38,7 @@ export class PlayerController {
   async updatePlayer(
     @Param('id') id: string,
     @Body() updatePlayerDto: UpdatePlayerDto,
-  ): Promise<IPlayer> {
+  ): Promise<Player> {
     return await this.playersService.updatePlayer(id, updatePlayerDto);
   }
 
