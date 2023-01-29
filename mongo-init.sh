@@ -10,6 +10,6 @@ db.createUser({
   pwd: '$MONGO_INITDB_ROOT_PASSWORD',
   roles: [{ role: 'readWrite', db: '$MONGO_INITDB_DATABASE' }],
 });
-db.createCollection('players');
+db.createCollection('player');
 
 EOF
