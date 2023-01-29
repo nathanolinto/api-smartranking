@@ -4,7 +4,6 @@ import {
   ObjectIdColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn,
 } from 'typeorm';
 import { IPlayer } from '../interfaces/player.interface';
 
