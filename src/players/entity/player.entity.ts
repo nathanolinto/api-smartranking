@@ -1,3 +1,4 @@
+import { Category } from 'src/categories/entities/category.entity';
 import {
   Column,
   Entity,
@@ -5,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ObjectID,
+  ManyToOne,
 } from 'typeorm';
 import { IPlayer } from '../interfaces/player.interface';
 
@@ -36,4 +38,7 @@ export class Player implements IPlayer {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @ManyToOne(() => Category, (category) => category.players)
+  category: Category;
 }
