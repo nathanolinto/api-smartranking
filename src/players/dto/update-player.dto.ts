@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-export class CreatePlayerDto {
+
+export class UpdatePlayerDto {
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -7,8 +8,4 @@ export class CreatePlayerDto {
   @IsString()
   @IsNotEmpty()
   phone: string;
-
-  @IsString()
-  @IsNotEmpty()
-  email: string;
 }
