@@ -4,7 +4,7 @@ import { IEvent } from './event.interface';
 
 export interface ICategory {
   _id: string | ObjectID;
-  type: string;
+  name: string;
   description: string;
   events: IEvent[];
   players: IPlayer[];

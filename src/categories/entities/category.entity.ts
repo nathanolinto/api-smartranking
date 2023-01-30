@@ -1,4 +1,12 @@
-import { Column, Entity, ObjectID, ObjectIdColumn, OneToMany } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ObjectID,
+  ObjectIdColumn,
+  OneToMany,
+  UpdateDateColumn,
+} from 'typeorm';
 import { ICategory } from '../interfaces/category.interface';
 import { Player } from '../../players/entity/player.entity';
 import { EventType } from './event.type';
@@ -9,7 +17,7 @@ export class Category implements ICategory {
   _id: ObjectID;
 
   @Column({ unique: true })
-  type: string;
+  name: string;
 
   @Column()
   description: string;
@@ -19,4 +27,10 @@ export class Category implements ICategory {
 
   @OneToMany(() => Player, (player) => player.category)
   players: Player[];
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }
