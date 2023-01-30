@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
-import { IDelete } from './interfaces/delete.interface';
+import { IDelete } from '../common/interfaces/delete.interface';
 import { Player } from './entity/player.entity';
 import { PlayersService } from './players.service';
 

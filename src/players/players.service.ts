@@ -7,7 +7,7 @@ import { CreatePlayerDto } from './dto/create-player.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Player } from './entity/player.entity';
 import { MongoRepository } from 'typeorm';
-import { IDelete } from './interfaces/delete.interface';
+import { IDelete } from '../common/interfaces/delete.interface';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { ObjectId } from 'mongodb';
 
