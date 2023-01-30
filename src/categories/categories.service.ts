@@ -69,26 +69,26 @@ export class CategoriesService {
   ): Promise<Category> {
     const { categoryId, playerId } = params;
 
-    const foundCategory = await this.categoryRepository.findOneBy({
+    const categoryFound = await this.categoryRepository.findOneBy({
       _id: new ObjectId(categoryId),
     });
-    if (!foundCategory) {
+    if (!categoryFound) {
       throw new BadRequestException('Category not found');
     }
-    if (!foundCategory.players) {
-      foundCategory.players = [];
+    if (!categoryFound.players) {
+      categoryFound.players = [];
     }
 
     await this.playersService.getPlayerById(playerId);
 
-    const playerAlreadyAssign = foundCategory.players.find((player) => {
+    const playerAlreadyAssign = categoryFound.players.find((player) => {
       return player === playerId;
     });
     if (playerAlreadyAssign) {
       throw new BadRequestException('Player already assign');
     }
 
-    foundCategory.players.push(playerId);
-    return await this.categoryRepository.save(foundCategory);
+    categoryFound.players.push(playerId);
+    return await this.categoryRepository.save(categoryFound);
   }
 }
