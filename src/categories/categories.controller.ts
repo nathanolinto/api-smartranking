@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { Category } from './entities/category.entity';
@@ -12,5 +12,10 @@ export class CategoriesController {
     @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<Category> {
     return await this.categoriesService.createCategory(createCategoryDto);
+  }
+
+  @Get()
+  async getAllCategories(): Promise<Category[]> {
+    return await this.categoriesService.getAllCategories();
   }
 }

@@ -21,4 +21,8 @@ export class CategoriesService {
     }
     return await this.categoryRepository.save(createCategoryDto);
   }
+
+  async getAllCategories(): Promise<Category[]> {
+    return await this.categoryRepository.find();
+  }
 }
