@@ -32,11 +32,7 @@ export class CategoriesService {
   }
 
   async getAllCategories(): Promise<Category[]> {
-    return await this.categoryRepository.findBy({
-      relations: {
-        players: true,
-      },
-    });
+    return await this.categoryRepository.findBy({});
   }
 
   async getCategoryById(id: string) {
