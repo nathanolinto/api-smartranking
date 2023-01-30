@@ -13,7 +13,10 @@ import { IDelete } from './interfaces/delete.interface';
 import { Player } from './entity/player.entity';
 import { PlayersService } from './players.service';
 
-@Controller('players')
+@Controller({
+  path: 'players',
+  version: '1',
+})
 export class PlayerController {
   constructor(private readonly playersService: PlayersService) {}
 
