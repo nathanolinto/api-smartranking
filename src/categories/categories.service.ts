@@ -41,4 +41,20 @@ export class CategoriesService {
     }
     return category;
   }
+
+  async updateCategory(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
+    const idObjectId = new ObjectId(id);
+    const foundCategory = await this.categoryRepository.findOneBy({
+      _id: idObjectId,
+    });
+    if (!foundCategory) {
+      throw new NotFoundException('Player not found');
+    }
+    const updatedCategory = Object.assign(foundCategory, updateCategoryDto);
+    await this.categoryRepository.save(updatedCategory);
+    return updatedCategory;
+  }
 }

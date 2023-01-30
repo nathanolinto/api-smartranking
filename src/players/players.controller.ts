@@ -17,21 +17,21 @@ import { PlayersService } from './players.service';
 export class PlayerController {
   constructor(private readonly playersService: PlayersService) {}
 
+  @Post()
+  async createPlayer(
+    @Body() createPlayerDto: CreatePlayerDto,
+  ): Promise<Player> {
+    return await this.playersService.createPlayer(createPlayerDto);
+  }
+
   @Get()
   async getAllPlayers(): Promise<Player[]> {
     return await this.playersService.getAllPlayers();
   }
 
   @Get(':id')
-  async getPlayerById(@Param('id') id: string) {
+  async getPlayerById(@Param('id') id: string): Promise<Player> {
     return await this.playersService.getPlayerById(id);
-  }
-
-  @Post()
-  async createPlayer(
-    @Body() createPlayerDto: CreatePlayerDto,
-  ): Promise<Player> {
-    return await this.playersService.createPlayer(createPlayerDto);
   }
 
   @Put(':id')
