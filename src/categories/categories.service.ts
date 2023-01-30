@@ -1,7 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ObjectId } from 'mongodb';
 import { MongoRepository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 
 @Injectable()
@@ -24,5 +30,15 @@ export class CategoriesService {
 
   async getAllCategories(): Promise<Category[]> {
     return await this.categoryRepository.find();
+  }
+
+  async getCategoryById(id: string) {
+    const category = await this.categoryRepository.findOneBy({
+      _id: new ObjectId(id),
+    });
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+    return category;
   }
 }
