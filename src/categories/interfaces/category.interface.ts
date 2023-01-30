@@ -1,5 +1,4 @@
 import { ObjectID } from 'typeorm';
-import { IPlayer } from '../../players/interfaces/player.interface';
 import { IEvent } from './event.interface';
 
 export interface ICategory {
@@ -7,5 +6,5 @@ export interface ICategory {
   name: string;
   description: string;
   events: IEvent[];
-  players: IPlayer[];
+  players: string[] | ObjectID[];
 }

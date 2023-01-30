@@ -1,4 +1,3 @@
-import { ICategory } from 'src/categories/interfaces/category.interface';
 import { ObjectID } from 'typeorm';
 
 export interface IPlayer {
@@ -9,5 +8,4 @@ export interface IPlayer {
   ranking: string;
   positionRanking: number;
   urlPhoto: string;
-  category: ICategory;
 }

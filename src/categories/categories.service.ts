@@ -5,7 +5,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
+import { PlayersService } from 'src/players/players.service';
 import { MongoRepository } from 'typeorm';
+import { AssignPlayerToCategoryDto } from './dto/assign-player-category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
@@ -15,21 +17,26 @@ export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: MongoRepository<Category>,
+    private readonly playersService: PlayersService,
   ) {}
 
   async createCategory(
     createCategoryDto: CreateCategoryDto,
   ): Promise<Category> {
     const { name } = createCategoryDto;
-    const foundPlayer = await this.categoryRepository.findOneBy({ name });
-    if (foundPlayer) {
+    const foundCategory = await this.categoryRepository.findOneBy({ name });
+    if (foundCategory) {
       throw new BadRequestException('Category with name already exists');
     }
     return await this.categoryRepository.save(createCategoryDto);
   }
 
   async getAllCategories(): Promise<Category[]> {
-    return await this.categoryRepository.find();
+    return await this.categoryRepository.findBy({
+      relations: {
+        players: true,
+      },
+    });
   }
 
   async getCategoryById(id: string) {
@@ -54,7 +61,34 @@ export class CategoriesService {
       throw new NotFoundException('Player not found');
     }
     const updatedCategory = Object.assign(foundCategory, updateCategoryDto);
-    await this.categoryRepository.save(updatedCategory);
-    return updatedCategory;
+    return this.categoryRepository.save(updatedCategory);
+  }
+
+  async assignPlayerToCategory(
+    params: AssignPlayerToCategoryDto,
+  ): Promise<Category> {
+    const { categoryId, playerId } = params;
+
+    const foundCategory = await this.categoryRepository.findOneBy({
+      _id: new ObjectId(categoryId),
+    });
+    if (!foundCategory) {
+      throw new BadRequestException('Category not found');
+    }
+    if (!foundCategory.players) {
+      foundCategory.players = [];
+    }
+
+    await this.playersService.getPlayerById(playerId);
+
+    const playerAlreadyAssign = foundCategory.players.find((player) => {
+      return player === playerId;
+    });
+    if (playerAlreadyAssign) {
+      throw new BadRequestException('Player already assign');
+    }
+
+    foundCategory.players.push(playerId);
+    return await this.categoryRepository.save(foundCategory);
   }
 }

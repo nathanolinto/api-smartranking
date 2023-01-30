@@ -4,11 +4,9 @@ import {
   Entity,
   ObjectID,
   ObjectIdColumn,
-  OneToMany,
   UpdateDateColumn,
 } from 'typeorm';
 import { ICategory } from '../interfaces/category.interface';
-import { Player } from '../../players/entity/player.entity';
 import { EventType } from './event.type';
 
 @Entity()
@@ -25,8 +23,8 @@ export class Category implements ICategory {
   @Column(() => EventType)
   events: EventType[];
 
-  @OneToMany(() => Player, (player) => player.category)
-  players: Player[];
+  @Column({ nullable: true, default: [] })
+  players: string[];
 
   @CreateDateColumn()
   created_at: Date;
