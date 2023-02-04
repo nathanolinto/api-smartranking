@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
+import { populate } from 'src/common/typeorm/populate';
 import { PlayersService } from 'src/players/players.service';
 import { MongoRepository } from 'typeorm';
 import { AssignPlayerToCategoryDto } from './dto/assign-player-category.dto';
@@ -32,17 +33,33 @@ export class CategoriesService {
   }
 
   async getAllCategories(): Promise<Category[]> {
-    return await this.categoryRepository.findBy({});
+    const categories = await this.categoryRepository.findBy({});
+    const categoriesWithPlayers = [];
+    for (const category of categories) {
+      const players = await populate({
+        ids: category.players,
+        service: this.playersService,
+        findById: 'getPlayerById',
+      });
+      categoriesWithPlayers.push(Object.assign(category, { players }));
+    }
+    return categoriesWithPlayers;
   }
 
-  async getCategoryById(id: string) {
+  async getCategoryById(id: string): Promise<Category> {
     const category = await this.categoryRepository.findOneBy({
       _id: new ObjectId(id),
     });
     if (!category) {
       throw new NotFoundException('Category not found');
     }
-    return category;
+    const players = await populate({
+      ids: category.players,
+      service: this.playersService,
+      findById: 'getPlayerById',
+    });
+
+    return Object.assign(category, { players });
   }
 
   async updateCategory(
