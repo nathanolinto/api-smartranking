@@ -9,13 +9,23 @@ import {
 } from '@nestjs/common';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
-import { IDelete } from './interfaces/delete.interface';
+import { IDelete } from '../common/interfaces/delete.interface';
 import { Player } from './entity/player.entity';
 import { PlayersService } from './players.service';
 
-@Controller('players')
+@Controller({
+  path: 'players',
+  version: '1',
+})
 export class PlayerController {
   constructor(private readonly playersService: PlayersService) {}
+
+  @Post()
+  async createPlayer(
+    @Body() createPlayerDto: CreatePlayerDto,
+  ): Promise<Player> {
+    return await this.playersService.createPlayer(createPlayerDto);
+  }
 
   @Get()
   async getAllPlayers(): Promise<Player[]> {
@@ -23,15 +33,8 @@ export class PlayerController {
   }
 
   @Get(':id')
-  async getPlayerById(@Param('id') id: string) {
+  async getPlayerById(@Param('id') id: string): Promise<Player> {
     return await this.playersService.getPlayerById(id);
-  }
-
-  @Post()
-  async createPlayer(
-    @Body() createPlayerDto: CreatePlayerDto,
-  ): Promise<Player> {
-    return await this.playersService.createPlayer(createPlayerDto);
   }
 
   @Put(':id')

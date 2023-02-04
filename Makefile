@@ -4,5 +4,8 @@ up:
 down:
 	docker-compose down
 
-restart:
-	docker-compose restart
+restart-app:
+	docker-compose restart smartranking-api
+
+logs:
+	docker-compose logs -f smartranking-api
