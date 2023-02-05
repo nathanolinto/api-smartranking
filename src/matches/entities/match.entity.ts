@@ -21,7 +21,7 @@ export class Match implements IMatch {
   result: ResultType[];
 
   @Column()
-  def: string;
+  winner: string;
 
   @CreateDateColumn()
   created_at: Date;

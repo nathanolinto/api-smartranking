@@ -12,5 +12,5 @@ export class CreateMatchDto {
   result: ResultType[];
 
   @IsMongoId()
-  def: string;
+  winner: string;
 }

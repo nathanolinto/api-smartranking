@@ -6,5 +6,5 @@ export interface IMatch {
   _id: string | ObjectID;
   players: string[] | ObjectID[] | IPlayer[];
   result: IResult[];
-  def: string | ObjectID | IPlayer;
+  winner: string | ObjectID | IPlayer;
 }

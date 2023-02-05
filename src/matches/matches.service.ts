@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { populate } from '../common/typeorm/populate';
 import { PlayersService } from '../players/players.service';
@@ -16,8 +20,13 @@ export class MatchesService {
   ) {}
 
   async createMatch(createMatchDto: CreateMatchDto): Promise<Match> {
-    const playerDef = await this.playersService.getPlayerById(
-      createMatchDto.def,
+    if (!createMatchDto.players.includes(createMatchDto.winner)) {
+      throw new BadRequestException(
+        `winner ${createMatchDto.winner} not includes in players ${createMatchDto.players}`,
+      );
+    }
+    const playerWinner = await this.playersService.getPlayerById(
+      createMatchDto.winner,
     );
     for (const player of createMatchDto.players) {
       await this.playersService.getPlayerById(player);
@@ -28,7 +37,7 @@ export class MatchesService {
       service: this.playersService,
       findById: 'getPlayerById',
     });
-    return Object.assign(match, { players, def: playerDef });
+    return Object.assign(match, { players, winner: playerWinner });
   }
 
   async getAllMatches(): Promise<Match[]> {
@@ -40,9 +49,11 @@ export class MatchesService {
         service: this.playersService,
         findById: 'getPlayerById',
       });
-      const playerDef = await this.playersService.getPlayerById(match.def);
+      const playerWinner = await this.playersService.getPlayerById(
+        match.winner,
+      );
       matchesWithPlayers.push(
-        Object.assign(match, { players, def: playerDef }),
+        Object.assign(match, { players, winner: playerWinner }),
       );
     }
     return matchesWithPlayers;
@@ -55,24 +66,13 @@ export class MatchesService {
     if (!match) {
       throw new NotFoundException(`Match ${id} not found`);
     }
-
-    const test = await this.matchRepository.findBy({
-      _id: {
-        $in: [
-          new ObjectId('63e02654803dbc6d71d83fd3'),
-          new ObjectId('63e0280615afcf9cab5e5cc8'),
-        ],
-      },
-    });
-    console.log('---Teste', test);
-
     const players = await populate({
       ids: match.players,
       service: this.playersService,
       findById: 'getPlayerById',
     });
-    const playerDef = await this.playersService.getPlayerById(match.def);
+    const playerWinner = await this.playersService.getPlayerById(match.winner);
 
-    return Object.assign(match, { players, def: playerDef });
+    return Object.assign(match, { players, winner: playerWinner });
   }
 }
