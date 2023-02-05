@@ -1,5 +1,12 @@
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from 'class-validator';
-import { IEvent } from '../interfaces/event.interface';
+import { Type } from 'class-transformer';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsNotEmpty,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { EventType } from '../entities/event.type';
 
 export class CreateCategoryDto {
   @IsString()
@@ -12,5 +19,7 @@ export class CreateCategoryDto {
 
   @IsArray()
   @ArrayNotEmpty()
-  events: IEvent[];
+  @ValidateNested()
+  @Type(() => EventType)
+  events: EventType[];
 }
