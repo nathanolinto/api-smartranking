@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { GetByIdDto } from 'src/common/dto/getById.dto';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { Match } from './entities/match.entity';
 import { MatchesService } from './matches.service';
@@ -8,7 +9,17 @@ export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
 
   @Post()
-  async createCategory(@Body() createMatchDto: CreateMatchDto): Promise<Match> {
+  async createMatch(@Body() createMatchDto: CreateMatchDto): Promise<Match> {
     return await this.matchesService.createMatch(createMatchDto);
+  }
+
+  @Get()
+  async getAllMatches(): Promise<Match[]> {
+    return await this.matchesService.getAllMatches();
+  }
+
+  @Get(':id')
+  async getMatchById(@Param() params: GetByIdDto): Promise<Match> {
+    return await this.matchesService.getMatchById(params.id);
   }
 }
