@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { GetByIdDto } from 'src/common/dto/getById.dto';
 import { CategoriesService } from './categories.service';
 import { AssignPlayerToCategoryDto } from './dto/assign-player-category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -25,16 +26,19 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  async getPlayerById(@Param('id') id: string): Promise<Category> {
-    return await this.categoriesService.getCategoryById(id);
+  async getPlayerById(@Param() params: GetByIdDto): Promise<Category> {
+    return await this.categoriesService.getCategoryById(params.id);
   }
 
   @Put(':id')
   async updatePlayer(
-    @Param('id') id: string,
+    @Param() params: GetByIdDto,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    return await this.categoriesService.updateCategory(id, updateCategoryDto);
+    return await this.categoriesService.updateCategory(
+      params.id,
+      updateCategoryDto,
+    );
   }
 
   @Post(':categoryId/player/:playerId')

@@ -12,6 +12,7 @@ import { UpdatePlayerDto } from './dto/update-player.dto';
 import { IDelete } from '../common/interfaces/delete.interface';
 import { Player } from './entity/player.entity';
 import { PlayersService } from './players.service';
+import { GetByIdDto } from 'src/common/dto/getById.dto';
 
 @Controller({
   path: 'players',
@@ -33,16 +34,16 @@ export class PlayerController {
   }
 
   @Get(':id')
-  async getPlayerById(@Param('id') id: string): Promise<Player> {
-    return await this.playersService.getPlayerById(id);
+  async getPlayerById(@Param() params: GetByIdDto): Promise<Player> {
+    return await this.playersService.getPlayerById(params.id);
   }
 
   @Put(':id')
   async updatePlayer(
-    @Param('id') id: string,
+    @Param() params: GetByIdDto,
     @Body() updatePlayerDto: UpdatePlayerDto,
   ): Promise<Player> {
-    return await this.playersService.updatePlayer(id, updatePlayerDto);
+    return await this.playersService.updatePlayer(params.id, updatePlayerDto);
   }
 
   @Delete('/all')
@@ -51,7 +52,7 @@ export class PlayerController {
   }
 
   @Delete(':id')
-  async deletePlayer(@Param('id') id: string): Promise<IDelete> {
-    return await this.playersService.deletePlayerById(id);
+  async deletePlayer(@Param() params: GetByIdDto): Promise<IDelete> {
+    return await this.playersService.deletePlayerById(params.id);
   }
 }
