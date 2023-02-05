@@ -20,9 +20,11 @@ export class PlayersService {
 
   async createPlayer(createPlayerDto: CreatePlayerDto): Promise<Player> {
     const { email } = createPlayerDto;
-    const foundPlayer = await this.playerRepository.findOneBy({ email });
-    if (foundPlayer) {
-      throw new BadRequestException('Player with e-mail already exists');
+    const player = await this.playerRepository.findOneBy({ email });
+    if (player) {
+      throw new BadRequestException(
+        `Player with e-mail ${email} already exists`,
+      );
     }
     return await this.playerRepository.save(createPlayerDto);
   }
@@ -31,14 +33,13 @@ export class PlayersService {
     id: string,
     updatePlayerDto: UpdatePlayerDto,
   ): Promise<Player> {
-    const idObjectId = new ObjectId(id);
-    const foundPlayer = await this.playerRepository.findOneBy({
-      _id: idObjectId,
+    const player = await this.playerRepository.findOneBy({
+      _id: new ObjectId(id),
     });
-    if (!foundPlayer) {
-      throw new NotFoundException('Player not found');
+    if (!player) {
+      throw new NotFoundException(`Player ${id} not found`);
     }
-    const updatedPlayer = Object.assign(foundPlayer, updatePlayerDto);
+    const updatedPlayer = Object.assign(player, updatePlayerDto);
     await this.playerRepository.save(updatedPlayer);
     return updatedPlayer;
   }
@@ -52,7 +53,7 @@ export class PlayersService {
       _id: new ObjectId(id),
     });
     if (!player) {
-      throw new NotFoundException('Player not found');
+      throw new NotFoundException(`Player ${id} not found`);
     }
     return player;
   }
