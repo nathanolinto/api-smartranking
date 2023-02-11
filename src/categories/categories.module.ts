@@ -3,10 +3,10 @@ import { CategoriesService } from './categories.service';
 import { CategoriesController } from './categories.controller';
 import { Category } from './entities/category.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PlayersModule } from 'src/players/players.module';
+import { Player } from '../players/entity/player.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Category]), PlayersModule],
+  imports: [TypeOrmModule.forFeature([Category, Player])],
   providers: [CategoriesService],
   controllers: [CategoriesController],
 })

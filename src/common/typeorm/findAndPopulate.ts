@@ -11,7 +11,9 @@ interface IFindAndPopulate {
   lookups: ILookups[];
 }
 
-export const findPopulate = async (params: IFindAndPopulate) => {
+export const findPopulate = async (
+  params: IFindAndPopulate,
+): Promise<any[]> => {
   const match = {
     $match: {
       ...params.where,

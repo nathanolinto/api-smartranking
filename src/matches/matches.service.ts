@@ -74,7 +74,8 @@ export class MatchesService {
         { from: 'player', localField: 'winner', as: 'winner', isSingle: true },
       ],
     });
-    if (!match) {
+    if (match.length <= 0) {
+      throw new NotFoundException(`Match ${id} not found`);
     }
     return match[0];
   }

@@ -24,7 +24,7 @@ export class Category implements ICategory {
   events: EventType[];
 
   @Column({ nullable: true, default: [] })
-  players: string[];
+  players: ObjectID[];
 
   @CreateDateColumn()
   created_at: Date;

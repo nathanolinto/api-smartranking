@@ -5,20 +5,21 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
-import { populate } from 'src/common/typeorm/populate';
-import { PlayersService } from 'src/players/players.service';
+import { findPopulate } from '../common/typeorm/findAndPopulate';
 import { MongoRepository } from 'typeorm';
 import { AssignPlayerToCategoryDto } from './dto/assign-player-category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
+import { Player } from '../players/entity/player.entity';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: MongoRepository<Category>,
-    private readonly playersService: PlayersService,
+    @InjectRepository(Player)
+    private readonly playerRepository: MongoRepository<Player>,
   ) {}
 
   async createCategory(
@@ -27,39 +28,30 @@ export class CategoriesService {
     const { name } = createCategoryDto;
     const foundCategory = await this.categoryRepository.findOneBy({ name });
     if (foundCategory) {
-      throw new BadRequestException('Category with name already exists');
+      throw new BadRequestException(
+        `Category with name ${name} already exists`,
+      );
     }
     return await this.categoryRepository.save(createCategoryDto);
   }
 
   async getAllCategories(): Promise<Category[]> {
-    const categories = await this.categoryRepository.findBy({});
-    const categoriesWithPlayers = [];
-    for (const category of categories) {
-      const players = await populate({
-        ids: category.players,
-        service: this.playersService,
-        findById: 'getPlayerById',
-      });
-      categoriesWithPlayers.push(Object.assign(category, { players }));
-    }
-    return categoriesWithPlayers;
+    return await findPopulate({
+      repository: this.categoryRepository,
+      lookups: [{ from: 'player', localField: 'players' }],
+    });
   }
 
   async getCategoryById(id: string): Promise<Category> {
-    const category = await this.categoryRepository.findOneBy({
-      _id: new ObjectId(id),
+    const category = await findPopulate({
+      repository: this.categoryRepository,
+      where: { _id: new ObjectId(id) },
+      lookups: [{ from: 'player', localField: 'players' }],
     });
-    if (!category) {
-      throw new NotFoundException('Category not found');
+    if (category.length <= 0) {
+      throw new NotFoundException(`Category ${id} not found`);
     }
-    const players = await populate({
-      ids: category.players,
-      service: this.playersService,
-      findById: 'getPlayerById',
-    });
-
-    return Object.assign(category, { players });
+    return category[0];
   }
 
   async updateCategory(
@@ -71,10 +63,12 @@ export class CategoriesService {
       _id: idObjectId,
     });
     if (!foundCategory) {
-      throw new NotFoundException('Player not found');
+      throw new NotFoundException(`Category {$id} not found`);
     }
-    const updatedCategory = Object.assign(foundCategory, updateCategoryDto);
-    return this.categoryRepository.save(updatedCategory);
+    return this.categoryRepository.save({
+      ...foundCategory,
+      ...updateCategoryDto,
+    });
   }
 
   async assignPlayerToCategory(
@@ -82,26 +76,31 @@ export class CategoriesService {
   ): Promise<Category> {
     const { categoryId, playerId } = params;
 
-    const categoryFound = await this.categoryRepository.findOneBy({
+    const category = await this.categoryRepository.findOneBy({
       _id: new ObjectId(categoryId),
     });
-    if (!categoryFound) {
-      throw new BadRequestException('Category not found');
+    if (!category) {
+      throw new BadRequestException(`Category ${categoryId} not found`);
     }
-    if (!categoryFound.players) {
-      categoryFound.players = [];
+    if (!category.players) {
+      category.players = [];
     }
-
-    await this.playersService.getPlayerById(playerId);
-
-    const playerAlreadyAssign = categoryFound.players.find((player) => {
-      return player === playerId;
+    const playerObjectId = new ObjectId(playerId);
+    const player = await this.playerRepository.findOneBy({
+      _id: playerObjectId,
     });
-    if (playerAlreadyAssign) {
-      throw new BadRequestException('Player already assign');
+    if (!player) {
+      throw new BadRequestException(`Player ${playerObjectId} not found`);
     }
 
-    categoryFound.players.push(playerId);
-    return await this.categoryRepository.save(categoryFound);
+    const playerAlreadyAssign = category.players.find(
+      (playerInPlayers) => String(playerInPlayers) === String(playerObjectId),
+    );
+    if (playerAlreadyAssign) {
+      throw new BadRequestException(`Player ${playerObjectId} already assign`);
+    }
+
+    category.players.push(player._id);
+    return await this.categoryRepository.save(category);
   }
 }
