@@ -15,13 +15,13 @@ export class Match implements IMatch {
   _id: ObjectID;
 
   @Column({ nullable: true, default: [] })
-  players: string[];
+  players: ObjectID[];
 
   @Column(() => ResultType)
   result: ResultType[];
 
-  @Column()
-  winner: string;
+  @Column(() => ObjectID)
+  winner: ObjectID;
 
   @CreateDateColumn()
   created_at: Date;
