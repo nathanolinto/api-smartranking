@@ -12,6 +12,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 import { Player } from '../players/entity/player.entity';
+import { translate } from '../common/messages';
 
 @Injectable()
 export class CategoriesService {
@@ -29,7 +30,7 @@ export class CategoriesService {
     const foundCategory = await this.categoryRepository.findOneBy({ name });
     if (foundCategory) {
       throw new BadRequestException(
-        `Category with name ${name} already exists`,
+        translate('category.name.already.exists', name),
       );
     }
     return await this.categoryRepository.save(createCategoryDto);
@@ -49,7 +50,7 @@ export class CategoriesService {
       lookups: [{ from: 'player', localField: 'players' }],
     });
     if (category.length <= 0) {
-      throw new NotFoundException(`Category ${id} not found`);
+      throw new NotFoundException(translate('category.id.not.found', id));
     }
     return category[0];
   }
@@ -58,15 +59,14 @@ export class CategoriesService {
     id: string,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    const idObjectId = new ObjectId(id);
-    const foundCategory = await this.categoryRepository.findOneBy({
-      _id: idObjectId,
+    const category = await this.categoryRepository.findOneBy({
+      _id: new ObjectId(id),
     });
-    if (!foundCategory) {
-      throw new NotFoundException(`Category {$id} not found`);
+    if (!category) {
+      throw new NotFoundException(translate('category.id.not.found', id));
     }
     return this.categoryRepository.save({
-      ...foundCategory,
+      ...category,
       ...updateCategoryDto,
     });
   }
@@ -80,24 +80,28 @@ export class CategoriesService {
       _id: new ObjectId(categoryId),
     });
     if (!category) {
-      throw new BadRequestException(`Category ${categoryId} not found`);
+      throw new BadRequestException(
+        translate('category.id.not.found', categoryId),
+      );
     }
     if (!category.players) {
       category.players = [];
     }
-    const playerObjectId = new ObjectId(playerId);
+
     const player = await this.playerRepository.findOneBy({
-      _id: playerObjectId,
+      _id: new ObjectId(playerId),
     });
     if (!player) {
-      throw new BadRequestException(`Player ${playerObjectId} not found`);
+      throw new BadRequestException(translate('player.id.not.found', playerId));
     }
 
     const playerAlreadyAssign = category.players.find(
-      (playerInPlayers) => String(playerInPlayers) === String(playerObjectId),
+      (playerInPlayers) => String(playerInPlayers) === playerId,
     );
     if (playerAlreadyAssign) {
-      throw new BadRequestException(`Player ${playerObjectId} already assign`);
+      throw new BadRequestException(
+        translate('player.id.already.assign', playerId),
+      );
     }
 
     category.players.push(player._id);

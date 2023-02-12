@@ -10,6 +10,7 @@ import { Match } from './entities/match.entity';
 import { ObjectId } from 'mongodb';
 import { Player } from '../players/entity/player.entity';
 import { findPopulate } from '../common/typeorm/findAndPopulate';
+import { translate } from '../common/messages';
 
 @Injectable()
 export class MatchesService {
@@ -23,7 +24,10 @@ export class MatchesService {
   async createMatch(createMatchDto: CreateMatchDto): Promise<Match> {
     if (!createMatchDto.players.includes(createMatchDto.winner)) {
       throw new BadRequestException(
-        `winner ${createMatchDto.winner} not includes in players ${createMatchDto.players}`,
+        translate('match.winner.id.not.includes.players', [
+          createMatchDto.winner,
+          String(createMatchDto.players),
+        ]),
       );
     }
     const winnerObjectId = new ObjectId(createMatchDto.winner);
@@ -31,7 +35,9 @@ export class MatchesService {
       _id: winnerObjectId,
     });
     if (!playerWinner) {
-      throw new NotFoundException(`winner ${createMatchDto.winner} not found`);
+      throw new NotFoundException(
+        translate('match.winner.id.not.found', createMatchDto.winner),
+      );
     }
 
     const playersObjectId = createMatchDto.players.map(
@@ -43,7 +49,10 @@ export class MatchesService {
       });
       if (!player) {
         throw new NotFoundException(
-          `players.${index} ${playerObjectId} not found`,
+          translate('match.players.id.not.found', [
+            String(index),
+            String(playerObjectId),
+          ]),
         );
       }
     }
@@ -75,7 +84,7 @@ export class MatchesService {
       ],
     });
     if (match.length <= 0) {
-      throw new NotFoundException(`Match ${id} not found`);
+      throw new NotFoundException(translate('match.id.not.found', id));
     }
     return match[0];
   }

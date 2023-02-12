@@ -10,6 +10,7 @@ import { MongoRepository } from 'typeorm';
 import { IDelete } from '../common/interfaces/delete.interface';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { ObjectId } from 'mongodb';
+import { translate } from 'src/common/messages';
 
 @Injectable()
 export class PlayersService {
@@ -23,7 +24,7 @@ export class PlayersService {
     const player = await this.playerRepository.findOneBy({ email });
     if (player) {
       throw new BadRequestException(
-        `Player with e-mail ${email} already exists`,
+        translate('player.email.already.exists', email),
       );
     }
     return await this.playerRepository.save(createPlayerDto);
@@ -37,7 +38,7 @@ export class PlayersService {
       _id: new ObjectId(id),
     });
     if (!player) {
-      throw new NotFoundException(`Player ${id} not found`);
+      throw new NotFoundException(translate('player.id.not.found', id));
     }
     const updatedPlayer = Object.assign(player, updatePlayerDto);
     await this.playerRepository.save(updatedPlayer);
@@ -53,7 +54,7 @@ export class PlayersService {
       _id: new ObjectId(id),
     });
     if (!player) {
-      throw new NotFoundException(`Player ${id} not found`);
+      throw new NotFoundException(translate('player.id.not.found', id));
     }
     return player;
   }
